@@ -1,0 +1,130 @@
+BOS Landscape
+	Finance Team
+		Account Payable
+			ทำจ่ายค่าใช้จ่ายตามรอบ
+			ตั้งโอนรายการค่าใช้จ่าย
+			ติดตามใบเสร็จรับเงินของเงินกู้ ดอกเบี้ย ค่าธรรมเนียม
+			ใบหัก ณ ที่จ่าย (Supplier)
+			Coordinate Internal and External ส่งหลักฐานการโอนเงิน
+			รับวางบิลจาก Supplier
+			ติดตามใบกำกับ ใบเสร็จรับเงิน จาก Vendor
+			เขียนใบสั่งงานให้ Massenger
+		Account Receivable
+			วางบิลลูกค้า
+			ติดตามสถานะการชำระเงินจากลูกค้า
+			ติดตามใบหัก ณ ที่จ่าย จากลูกค้า
+			Reciept Payment ทำใบเสร็จรับเงินให้ลูกค้า
+			เขียนใบสั่งงานให้ Massenger
+		Report
+			Overview
+				Monthly Bank Statement
+				Decision Making Report
+					Overview Dashboard
+					Strategic Planning
+					ROI
+					P&L Finance
+					Break Evenpoint
+					Cash Flow
+				Awareness
+					Budget Awareness
+					Define budget reponsibility
+			Product
+				Support product
+					เก็บสัญญาลูกค้า
+					Timesheet Report
+					Cost Sheet Report
+				Decision Making Report
+					Overview Dashboard
+					Strategic Planning
+					ROI
+					P&L Finance
+					Break Evenpoint
+					Cash Flow
+				Awareness
+					Budget Awareness
+					Define budget reponsibility
+		Bank
+			ติดต่อธนาคาร
+			Monitor Loan
+			สัญญาเงินกู้
+		AI and Automation
+			Alert and Notification System
+		Governance
+			 Flow
+			 Form
+			 Policy
+			Internal Control Finance
+	Account Team
+		Account Payable
+			ตรวจสอบเอกสารจ่าย
+			บันทึกบัญชีค่าใช้จ่ายเพื่อเตรียมจ่าย (ตั้งหนี้)
+			บันทึกบัญชีเงินทดรองจ่าย
+		Account Receivable
+			รับเงินอื่น ๆ
+		GL (แยกประเภท)
+			Pre-Paid Expense รายการตัดจ่าย ปรับปรุงบัญชี
+			Reconcile Bank
+			Reconcile Tax
+			บันทึกเคลียร์เงินทดรองจ่าย
+			Accumulate Expense / Cost-of-Goods Sold
+			Depreciation and Amortization
+		Report
+			รายงานการใช้งานบัตรเครดิต
+			Decision Making Report
+				P&L Account
+				Overview Dashboard
+				รายละเอียดประกอบงบการเงิน
+			Cost Sheet Report
+			Awareness
+				Budget Awareness
+		Coordination
+			ประสานงาน Accounting Audit
+			ประสานงานสรรพากร
+		Taxation
+			ภ.ง.ด.3, ภ.ง.ด.53, ภ.ง.ด.54, ภ.พ.30, ภ.พ.36
+			สรุปภาษีถูกหักของลูกค้า
+		Assets
+			Assets แบ่งประเภท
+		Governance
+			 Flow
+			 Form
+			 Policy
+			Internal Control Account
+		AI and Automation
+			Alert and Notification System
+	Admin Team
+		Report
+			ค่าสาธารณูปโภคประจำเดือน
+			Petty Cash
+			บริหารสัญญาประจำปี เช่น บ้าน รถ
+			Overview Dashboard
+			Sticker ที่จอดรถ
+			Stock จัดซื้อ
+		Maintenance
+			Office and Facility Maintenance
+			Car Maintenance
+			Office Equipment Maintenance
+		AI and Automation
+			Alert and Notification System
+			Bot แจ้งซ่อม
+			Bot Stock
+		Coordination
+			ประสานงาน Massenger
+			ประสานงานกับทางนิติ
+				Sticker ที่จอดรถ
+			เอกสารทางด้านการขาย เช่น อากรแสตมป์ เอกสารบริษัท (บอจ.) หนังสือรับรอง
+	Purchase Team
+		Report
+			ประเมินคัดเลือกผู้ขาย
+			ประเมินหลังการขาย
+			Overview Dashboard
+			สัญญา Supplier
+			ทะเบียนผู้ขาย (Vendor List)
+		AI and Automation
+			Alert and Notification System
+		Coordination
+			ประสานงานกับ Supplier
+		Issue PO
+			Supplier
+			ผู้ขอซื้อ
+			Goods Reciept Document

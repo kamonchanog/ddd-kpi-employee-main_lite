@@ -1,0 +1,967 @@
+{
+  "$schema": "./ddd-schema.json",
+  "$id": "./ddd-kpi-employee-v1.0.0.json",
+  "meta": {
+    "id": "ddd-kpi-employee",
+    "version": "1.0.0",
+    "title": "DDD-KPI — KPI Documentation Framework (Employee Edition)",
+    "description": "Framework สำหรับพนักงาน Ragnar ในการกำหนด KPI ประจำไตรมาสอย่างเป็นระบบ รับ Context บริษัท บทบาทงาน นโยบาย KPI และ KPI Company แล้ว generate Key Results, Key Activities, พร้อม spec สำหรับ Presentation ต้นและปลายไตรมาส",
+    "language": "th/en bilingual — narrative sections in Thai, identifiers, field names, and metric names in English",
+    "output_dir": "docs/",
+    "domain": "Performance Management / KPI Setting",
+    "applicable_when": "พนักงาน Ragnar ทุกระดับ (Operation และ Team Leader) ที่ต้องการกำหนด KPI ประจำไตรมาสอย่างเป็นระบบ สอดคล้องกับ KPI Company และนโยบาย KPI ขององค์กร",
+    "generation_order": [
+      "context_map",
+      "role_profile",
+      "kpi_charter",
+      "key_results",
+      "key_activities",
+      "presentation_spec"
+    ],
+    "agent_instructions": {
+      "role": "คุณคือ KPI Advisor ผู้เชี่ยวชาญด้าน Performance Management สำหรับ Ragnar ใช้ DDD-KPI framework อ่าน Input Context ทั้งหมดที่พนักงานให้มา (Company Context, KPI Policy, Job Description, Job Landscape, KPI Company ของไตรมาสนี้) แล้วสร้างเอกสาร KPI Planning ให้ครบชุดตาม generation_order เนื้อหาทุกชิ้นต้องสอดคล้องกันและอ้างอิงข้อมูลจาก upstream documents เสมอ ห้ามสร้าง KPI หรือ target ขึ้นมาเองโดยไม่มี basis จาก Input Context",
+      "generation_order_strategy": "เริ่มจาก context_map เพื่อ map Company Strategy กับ KPI Company ของไตรมาส จากนั้น role_profile เพื่อสรุปบทบาทและ constraints จาก JD + Job Landscape ทั้งสองเป็น foundation ของ kpi_charter ที่กำหนด Objectives, weights, และ measurement method แล้วจึง generate key_results (SMART targets ต่อ Objective) และ key_activities (กิจกรรมต่อเดือน) presentation_spec generate ได้เมื่อมี KR และ KA ครบแล้ว เพราะต้องใช้ข้อมูลจริงจากทั้งสองมา populate slide",
+      "content_language": "เนื้อหา narrative sections เขียนเป็นภาษาไทย identifiers, field names, column headers, metric names, และ code เขียนเป็นภาษาอังกฤษ ชื่อ KPI และ Key Result ให้มีทั้งภาษาไทยและอังกฤษ",
+      "quality_gate": "ทุก KR ต้องเป็น SMART (Specific, Measurable, Achievable, Relevant, Time-bound) พร้อมตัวเลข target ชัดเจน ทุก KPI ต้องมี data_source ที่ verify ได้และ link ไปยัง KPI Company อย่างน้อย 1 ข้อ weight รวมทุก KPI ต้องได้ 100% เสมอ Key Activities ต้องแบ่งตาม Month 1, 2, 3 พร้อม owner และ deadline ทุก document ต้องอ้างอิง upstream documents ด้วย context จริง ไม่ใช่ template ว่าง",
+      "domain_specific_notes": [
+        "Input Context ที่พนักงานต้องให้มาก่อน generate: (1) Company Context — Goal, Vision, Mission, Strategic Theme, (2) KPI Policy — นโยบายการกำหนด KPI ขององค์กร, (3) Job Description ของพนักงานคนนี้, (4) Job Landscape ของแผนกที่พนักงานสังกัด, (5) KPI Company ของไตรมาสนี้ที่ได้รับจากผู้บริหาร",
+        "KPI weight รวมกันต้องได้ 100% เสมอ ตรวจสอบก่อน generate key_results และ flag ถ้าไม่ตรง",
+        "แต่ละไตรมาสมี 3 เดือน KEY_ACTIVITIES.md ต้องแบ่งกิจกรรมเป็น Month 1, 2, 3 อย่างชัดเจน และระบุ milestone ปลายแต่ละเดือน",
+        "PRESENTATION_SPEC.md ต้องมีครบ 2 ส่วน: Q-Start (นำเสนอแผน KPI ต้นไตรมาส) และ Q-End (นำเสนอผลลัพธ์และบทเรียนปลายไตรมาส) ขาดอันใดอันหนึ่งไม่ได้"
+      ]
+    }
+  },
+  "phases": [
+    {
+      "id": "phase_context",
+      "order": 1,
+      "title": {
+        "th": "Phase 1 · บริบทและการ Align",
+        "en": "Phase 1 · Context & Alignment"
+      },
+      "description": {
+        "th": "วิเคราะห์และเชื่อมโยง Input Context ทั้งหมด: Company Strategy → KPI Company → บทบาทพนักงาน สร้างฐานความเข้าใจร่วมก่อนออกแบบ KPI",
+        "en": "Synthesize all Input Context: Company Strategy → Company KPI → Employee role. Builds the shared understanding foundation before KPI design."
+      },
+      "documents": [
+        {
+          "id": "context_map",
+          "filename": "CONTEXT_MAP.md",
+          "title": "Context Map — แผนที่บริบทองค์กรและไตรมาส",
+          "description": {
+            "th": "เชื่อมโยง Goal, Vision, Mission, Strategic Theme ขององค์กร กับ KPI Company ของไตรมาสนี้ และบทบาทของพนักงาน",
+            "en": "Maps company strategy (Goal/Vision/Mission/Strategic Theme) to this quarter's Company KPI and employee role"
+          },
+          "priority": "P0",
+          "depends_on": [],
+          "output_format": {
+            "type": "markdown",
+            "suggested_headings": [
+              "Company Strategy Summary",
+              "KPI Company This Quarter",
+              "Role-KPI Alignment Matrix",
+              "Quarter Context"
+            ]
+          },
+          "agent_hints": {
+            "instruction": "อ่าน Company Context document (Goal, Vision, Mission, Strategic Theme) และ KPI Company ของไตรมาสนี้ที่พนักงานให้มา สร้าง mapping ชัดเจนว่า KPI Company ข้อไหน connect กับ Strategic Theme ใด และ role ของพนักงานนี้ relate กับ KPI Company ข้อใดบ้าง ใช้ตารางอธิบาย connection ระบุ quarter number และปีให้ชัดเจนใน header ห้ามเพิ่ม KPI Company ที่ไม่มีใน Input",
+            "input_context": "Company Context document (Goal, Vision, Mission, Strategic Theme); KPI Company ของไตรมาสนี้ที่ผู้บริหารให้มา; ชื่อ quarter และปี (เช่น Q3/2026); ชื่อพนักงาน ตำแหน่ง และทีม",
+            "estimated_length": "400-600 words + 2 tables",
+            "validation": "ทุก KPI Company ต้องถูก map กับ Strategic Theme อย่างน้อย 1 ข้อ; ระบุ quarter และปีในทุก section; ระบุว่า role นี้ primarily contribute ต่อ KPI Company ข้อใด; ห้ามมี KPI Company ที่ไม่ได้มาจาก Input"
+          },
+          "sections": [
+            {
+              "id": "company_strategy_summary",
+              "heading": "Company Strategy Summary",
+              "description": {
+                "th": "สรุป Goal, Vision, Mission, และ Strategic Themes ที่ relevant กับไตรมาสนี้",
+                "en": "Summarize Goal, Vision, Mission, and Strategic Themes relevant to this quarter"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "Company Goal: สรุปเป้าหมายระยะยาวขององค์กรในประโยคที่กระชับ ใช้เป็น north star ของ KPI ทั้งหมด",
+                  "text_en": "Company Goal: concise long-term goal statement as the KPI north star"
+                },
+                {
+                  "text_th": "Vision & Mission: สรุป Vision (อยากเป็นอะไร) และ Mission (ทำอะไรเพื่อใคร) ที่ให้ context การตัดสินใจด้าน KPI",
+                  "text_en": "Vision & Mission: summarize what the company wants to be and how it serves its stakeholders"
+                },
+                {
+                  "text_th": "Strategic Themes: รายการ Strategic Theme ทั้งหมดของไตรมาสนี้ พร้อม priority หรือ weight ถ้ามี",
+                  "text_en": "Strategic Themes: all themes for this quarter with priority or weight if available"
+                }
+              ]
+            },
+            {
+              "id": "kpi_company_this_quarter",
+              "heading": "KPI Company This Quarter",
+              "description": {
+                "th": "รายการ KPI Company ของไตรมาสนี้ทั้งหมดที่ได้รับจากผู้บริหาร",
+                "en": "Full list of Company KPIs for this quarter as received from management"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "ตาราง KPI Company: KPI_ID | KPI Name (TH) | KPI Name (EN) | Target | Unit | Strategic Theme | Company Owner",
+                  "text_en": "Company KPI table: KPI_ID | KPI Name (TH) | KPI Name (EN) | Target | Unit | Strategic Theme | Company Owner"
+                },
+                {
+                  "text_th": "ระบุ KPI Company ที่ role นี้ต้อง contribute แบบ Primary (รับผิดชอบหลัก) และ Secondary (สนับสนุน)",
+                  "text_en": "Identify KPIs this role contributes to as Primary (main owner) vs. Secondary (supporting)"
+                }
+              ]
+            },
+            {
+              "id": "role_kpi_alignment",
+              "heading": "Role-KPI Alignment Matrix",
+              "description": {
+                "th": "ตาราง mapping ว่า KPI Company ข้อใดเชื่อมโยงกับ role นี้อย่างไร",
+                "en": "Matrix mapping Company KPIs to this role's contribution type"
+              },
+              "refs": [
+                "role_profile"
+              ],
+              "items": [
+                {
+                  "text_th": "Alignment Matrix: Company KPI | Contribution Type (Primary / Secondary / None) | เหตุผลการ align กับ role นี้",
+                  "text_en": "Alignment Matrix: Company KPI | Contribution Type (Primary / Secondary / None) | Alignment rationale"
+                },
+                {
+                  "text_th": "Flag ถ้ามี KPI Company ที่ไม่มี role ใดรับผิดชอบ (gap ของการ coverage)",
+                  "text_en": "Flag any Company KPI with no responsible role (coverage gap)"
+                }
+              ]
+            },
+            {
+              "id": "quarter_context",
+              "heading": "Quarter Context",
+              "description": {
+                "th": "ข้อมูลเชิง context ของไตรมาสนี้: ชื่อพนักงาน ทีม ตำแหน่ง ระดับ",
+                "en": "Quarter metadata: employee name, team, position, level, date range"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "Employee: ชื่อ-นามสกุล | ตำแหน่ง | ทีม | ระดับ (Team Leader / Operation)",
+                  "text_en": "Employee: Full Name | Position | Team | Level (Team Leader / Operation)"
+                },
+                {
+                  "text_th": "Quarter: Q_/20__ | วันเริ่มต้น | วันสิ้นสุด | รหัสไตรมาส (เช่น 2026-Q3)",
+                  "text_en": "Quarter: Q_/20__ | Start Date | End Date | Quarter Code (e.g. 2026-Q3)"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "role_profile",
+          "filename": "ROLE_PROFILE.md",
+          "title": "Role Profile — โปรไฟล์บทบาทและความรับผิดชอบ",
+          "description": {
+            "th": "สรุปบทบาท ความรับผิดชอบ ตำแหน่งในแผนก และข้อจำกัดจาก KPI Policy ที่ apply กับ role นี้",
+            "en": "Synthesizes role responsibilities, department position, and KPI Policy constraints applicable to this role"
+          },
+          "priority": "P0",
+          "depends_on": [
+            "context_map"
+          ],
+          "output_format": {
+            "type": "markdown",
+            "suggested_headings": [
+              "Core Responsibilities",
+              "Department Landscape",
+              "Collaboration Map",
+              "KPI Constraints & Policy Notes"
+            ]
+          },
+          "agent_hints": {
+            "instruction": "อ่าน Job Description และ Job Landscape ของแผนก สรุปหน้าที่หลักของ role นี้ ตำแหน่งของ role ในแผนก (รายงานต่อใคร ดูแลใคร ประสานงานกับทีมใด) และข้อจำกัดจาก KPI Policy ที่ต้องคำนึงถึงในการกำหนด KPI เนื้อหาต้องมาจาก JD และ Job Landscape จริง ห้ามเพิ่มหน้าที่ที่ไม่มีใน JD",
+            "input_context": "Job Description ของพนักงาน; Job Landscape ของแผนก; KPI Policy — โดยเฉพาะส่วน eligibility, weight rules, measurement frequency, และ scoring rubric; CONTEXT_MAP.md (Role-KPI Alignment Matrix)",
+            "estimated_length": "500-700 words",
+            "validation": "Core Responsibilities ต้องสอดคล้องกับ JD จริง ไม่เพิ่มหน้าที่ที่ไม่มีใน JD; KPI Constraints ต้องอ้างอิง KPI Policy โดยระบุ section หรือข้อที่เกี่ยวข้อง; Collaboration Map ต้องระบุ stakeholders ทั้ง internal และ external"
+          },
+          "sections": [
+            {
+              "id": "core_responsibilities",
+              "heading": "Core Responsibilities",
+              "description": {
+                "th": "หน้าที่และความรับผิดชอบหลักของ role นี้ สกัดจาก JD",
+                "en": "Primary duties and responsibilities extracted from JD"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "รายการหน้าที่หลัก (3-7 ข้อ) พร้อม output ที่คาดหวังต่อแต่ละหน้าที่",
+                  "text_en": "List of core duties (3-7 items) with expected output per duty"
+                },
+                {
+                  "text_th": "Key decisions: การตัดสินใจที่ role นี้มีอำนาจทำได้เอง vs. ต้องขออนุมัติ",
+                  "text_en": "Key decisions: decisions this role owns independently vs. requires approval"
+                }
+              ]
+            },
+            {
+              "id": "department_landscape",
+              "heading": "Department Landscape",
+              "description": {
+                "th": "ตำแหน่งของ role นี้ใน ecosystem ของแผนก สรุปจาก Job Landscape",
+                "en": "Position of this role within the department ecosystem, from Job Landscape"
+              },
+              "refs": [
+                "context_map"
+              ],
+              "items": [
+                {
+                  "text_th": "โครงสร้างแผนก: รายงานต่อใคร มีผู้ใต้บังคับบัญชาหรือไม่ และ role นี้อยู่ใน cluster ใดของแผนก",
+                  "text_en": "Department structure: reporting line, direct reports if any, which cluster this role belongs to"
+                },
+                {
+                  "text_th": "บทบาทของแผนกนี้ใน Strategic Theme ขององค์กร (จาก CONTEXT_MAP.md)",
+                  "text_en": "Department's role in company Strategic Themes (from CONTEXT_MAP.md)"
+                }
+              ]
+            },
+            {
+              "id": "collaboration_map",
+              "heading": "Collaboration Map",
+              "description": {
+                "th": "ทีม แผนก และ stakeholders ที่ต้องประสานงานด้วยในการทำ KPI ให้สำเร็จ",
+                "en": "Teams, departments, and stakeholders to collaborate with for KPI delivery"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "Internal stakeholders: ทีมหรือบุคคลที่ depend on output ของ role นี้ (downstream)",
+                  "text_en": "Internal stakeholders: teams/people depending on this role's output (downstream)"
+                },
+                {
+                  "text_th": "External dependencies: ทีมหรือบุคคลที่ role นี้ต้อง depend on เพื่อให้ KPI สำเร็จ (upstream)",
+                  "text_en": "External dependencies: teams/people this role depends on for KPI success (upstream)"
+                }
+              ]
+            },
+            {
+              "id": "kpi_constraints",
+              "heading": "KPI Constraints & Policy Notes",
+              "description": {
+                "th": "ข้อจำกัดและกฎจาก KPI Policy ที่ apply กับ role และระดับนี้",
+                "en": "KPI Policy constraints and rules applicable to this role and level"
+              },
+              "refs": [
+                "kpi_charter"
+              ],
+              "items": [
+                {
+                  "text_th": "จำนวน KPI ต่อไตรมาสที่นโยบายกำหนด (min/max) สำหรับ role ระดับนี้",
+                  "text_en": "Number of KPIs per quarter per policy (min/max) for this role level"
+                },
+                {
+                  "text_th": "Weight rules: ข้อกำหนดการกระจาย weight ตาม KPI Policy (เช่น ไม่มี KPI ข้อใดมี weight เกิน 40%)",
+                  "text_en": "Weight rules: weight distribution constraints per policy (e.g., no single KPI exceeds 40%)"
+                },
+                {
+                  "text_th": "Measurement frequency: รอบการวัดผลที่ policy กำหนด (เช่น monthly tracking, quarterly evaluation)",
+                  "text_en": "Measurement frequency mandated by policy (e.g., monthly tracking, quarterly evaluation)"
+                },
+                {
+                  "text_th": "Scoring rubric ที่ policy ใช้: เช่น scoring 0-120 scale, เกณฑ์ผ่าน/ไม่ผ่าน",
+                  "text_en": "Policy scoring rubric: e.g., 0-120 scale, pass/fail thresholds"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase_kpi_design",
+      "order": 2,
+      "title": {
+        "th": "Phase 2 · ออกแบบ KPI",
+        "en": "Phase 2 · KPI Design"
+      },
+      "description": {
+        "th": "กำหนด KPI Objectives, Key Results ที่วัดได้ และ Key Activities ที่ทำได้จริง",
+        "en": "Define KPI Objectives, measurable Key Results, and actionable Key Activities"
+      },
+      "documents": [
+        {
+          "id": "kpi_charter",
+          "filename": "KPI_CHARTER.md",
+          "title": "KPI Charter — กฎบัตร KPI ประจำไตรมาส",
+          "description": {
+            "th": "กำหนด KPI Objectives ของพนักงาน พร้อม weight, เกณฑ์ความสำเร็จ, วิธีวัดผล และการตรวจสอบตาม KPI Policy",
+            "en": "Defines employee KPI Objectives with weight, success criteria, measurement method, and Policy compliance check"
+          },
+          "priority": "P0",
+          "depends_on": [
+            "context_map",
+            "role_profile"
+          ],
+          "output_format": {
+            "type": "markdown",
+            "suggested_headings": [
+              "KPI Objectives Summary",
+              "Success Criteria per KPI",
+              "Measurement Method",
+              "KPI Policy Compliance Check"
+            ]
+          },
+          "agent_hints": {
+            "instruction": "ใช้ CONTEXT_MAP.md (Role-KPI Alignment Matrix) และ ROLE_PROFILE.md (core responsibilities, KPI constraints) กำหนด KPI Objectives สำหรับพนักงานคนนี้ แต่ละ Objective ต้องระบุ weight (รวมทุก KPI = 100% เสมอ), link ไปยัง KPI Company, เกณฑ์ความสำเร็จแบบ 3 ระดับ (Partial/Full/Exceed), และ data source อ้างอิง KPI Policy ในทุกจุดที่เกี่ยวข้อง จำนวน KPI ต้องอยู่ใน range ที่ policy กำหนด",
+            "input_context": "CONTEXT_MAP.md (KPI Company list, role alignment); ROLE_PROFILE.md (core responsibilities, KPI constraints, weight rules, scoring rubric); KPI Policy document",
+            "estimated_length": "600-900 words + tables",
+            "validation": "Weight ทุก KPI รวมกันได้ 100% เท่านั้น; ทุก KPI ต้องมี link ชัดเจนไปยัง KPI Company อย่างน้อย 1 ข้อ; เกณฑ์ 3 ระดับต้องใช้ตัวเลขจริง ไม่ใช่ qualitative เท่านั้น; จำนวน KPI ต้องอยู่ใน min/max ที่ ROLE_PROFILE.md ระบุ"
+          },
+          "sections": [
+            {
+              "id": "kpi_objectives_summary",
+              "heading": "KPI Objectives Summary",
+              "description": {
+                "th": "รายการ KPI Objectives ทั้งหมดของพนักงาน พร้อม weight และ link ไปยัง KPI Company",
+                "en": "All employee KPI Objectives with weight and Company KPI linkage"
+              },
+              "refs": [
+                "context_map",
+                "role_profile"
+              ],
+              "items": [
+                {
+                  "text_th": "ตาราง KPI: KPI_# | KPI Name (TH) | KPI Name (EN) | Weight% | Linked Company KPI | KPI Type (Quantity/Quality/Behavior)",
+                  "text_en": "KPI table: KPI_# | KPI Name (TH) | KPI Name (EN) | Weight% | Linked Company KPI | KPI Type"
+                },
+                {
+                  "text_th": "ยืนยัน Total Weight = 100% และ flag ถ้ามี KPI ที่ weight เกิน threshold ตาม policy",
+                  "text_en": "Confirm Total Weight = 100% and flag any KPI exceeding policy weight threshold"
+                }
+              ]
+            },
+            {
+              "id": "success_criteria",
+              "heading": "Success Criteria per KPI",
+              "description": {
+                "th": "เกณฑ์การประเมินความสำเร็จสำหรับแต่ละ KPI แบบ 3 ระดับ",
+                "en": "3-level success criteria for each KPI"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "ตาราง scoring: KPI_# | Partial (เช่น 70%) คืออะไร | Full (100%) คืออะไร | Exceed (เช่น 120%) คืออะไร | Unit of Measure",
+                  "text_en": "Scoring table: KPI_# | Partial level definition | Full (100%) definition | Exceed definition | Unit"
+                },
+                {
+                  "text_th": "Baseline ปัจจุบัน (ถ้ามี) สำหรับแต่ละ KPI เพื่อใช้ตั้ง target ที่ realistic และ achievable",
+                  "text_en": "Current baseline (if available) per KPI for setting realistic and achievable targets"
+                }
+              ]
+            },
+            {
+              "id": "measurement_method",
+              "heading": "Measurement Method",
+              "description": {
+                "th": "วิธีการและแหล่งข้อมูลสำหรับวัดผลแต่ละ KPI",
+                "en": "Measurement approach and data sources for each KPI"
+              },
+              "refs": [
+                "key_results"
+              ],
+              "items": [
+                {
+                  "text_th": "ตาราง: KPI_# | Data Source | Measurement Owner | Frequency (Monthly/Quarterly) | Tool/System",
+                  "text_en": "Table: KPI_# | Data Source | Measurement Owner | Frequency | Tool/System"
+                },
+                {
+                  "text_th": "ระบุ lead indicators (วัดระหว่างทาง) vs. lag indicators (วัดผลสุดท้าย) สำหรับแต่ละ KPI",
+                  "text_en": "Distinguish lead indicators (in-progress) vs. lag indicators (final result) per KPI"
+                }
+              ]
+            },
+            {
+              "id": "kpi_policy_compliance",
+              "heading": "KPI Policy Compliance Check",
+              "description": {
+                "th": "Checklist ตรวจสอบว่า KPI ทั้งหมดเป็นไปตามนโยบาย KPI ขององค์กร",
+                "en": "Checklist verifying all KPIs comply with the KPI Policy"
+              },
+              "refs": [
+                "role_profile"
+              ],
+              "items": [
+                {
+                  "text_th": "Compliance Checklist: จำนวน KPI อยู่ใน range ที่ policy กำหนด ✓/✗ | Total weight = 100% ✓/✗ | ทุก KPI มี data source ✓/✗ | ทุก KPI link กับ KPI Company ✓/✗ | ทุก KPI มีเกณฑ์ 3 ระดับ ✓/✗",
+                  "text_en": "Compliance checklist: KPI count in range ✓/✗ | Weight = 100% ✓/✗ | All KPIs have data source ✓/✗ | All KPIs linked to Company KPI ✓/✗ | All KPIs have 3-level criteria ✓/✗"
+                },
+                {
+                  "text_th": "Note: รายการที่ fail checklist ต้องแก้ไขก่อน proceed ไป key_results",
+                  "text_en": "Note: Failed checklist items must be resolved before proceeding to key_results"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "key_results",
+          "filename": "KEY_RESULTS.md",
+          "title": "Key Results — ผลลัพธ์หลักที่วัดได้",
+          "description": {
+            "th": "Key Results ที่เป็น SMART สำหรับแต่ละ KPI Objective พร้อม scoring rubric, data sources และ review schedule",
+            "en": "SMART Key Results per KPI Objective with scoring rubric, data sources, and review schedule"
+          },
+          "priority": "P0",
+          "depends_on": [
+            "kpi_charter"
+          ],
+          "output_format": {
+            "type": "markdown",
+            "suggested_headings": [
+              "Key Results per Objective",
+              "KR Scoring Rubric",
+              "KR Data Sources",
+              "Review Schedule"
+            ]
+          },
+          "agent_hints": {
+            "instruction": "สำหรับแต่ละ KPI Objective ใน KPI_CHARTER.md กำหนด Key Results ที่เป็น SMART (Specific, Measurable, Achievable, Relevant, Time-bound) แต่ละ KR ต้องมีตัวเลข target ชัดเจน (ไม่ใช่ qualitative เท่านั้น), unit, deadline ภายในไตรมาสนี้, scoring rubric, และ data source แต่ละ Objective ควรมี KR 2-4 ข้อ ห้ามมี KR ที่วัดไม่ได้ด้วยตัวเลข",
+            "input_context": "KPI_CHARTER.md (KPI Objectives, success criteria, measurement method, baseline)",
+            "estimated_length": "700-1000 words + tables",
+            "validation": "ทุก KR ต้องมีตัวเลข target ชัดเจน ไม่ใช่ qualitative; แต่ละ Objective ต้องมี KR อย่างน้อย 2 ข้อ; deadline ทุก KR ต้องอยู่ภายในไตรมาสนี้; ทุก KR ต้องมี data source ที่ verify ได้ตาม KPI_CHARTER.md"
+          },
+          "sections": [
+            {
+              "id": "kr_per_objective",
+              "heading": "Key Results per Objective",
+              "description": {
+                "th": "รายการ Key Results แยกตาม KPI Objective พร้อม target, baseline, unit",
+                "en": "Key Results list grouped by KPI Objective with target, baseline, and unit"
+              },
+              "refs": [
+                "kpi_charter"
+              ],
+              "items": [
+                {
+                  "text_th": "ต่อแต่ละ Objective: KR_# | Key Result Description (TH) | Key Result Description (EN) | Baseline | Target | Unit | Deadline",
+                  "text_en": "Per Objective: KR_# | Key Result Description (TH) | Key Result Description (EN) | Baseline | Target | Unit | Deadline"
+                },
+                {
+                  "text_th": "Tag แต่ละ KR ว่าเป็น Lead Indicator (วัดระหว่างทาง) หรือ Lag Indicator (วัดผลลัพธ์)",
+                  "text_en": "Tag each KR as Lead Indicator (in-progress measure) or Lag Indicator (outcome measure)"
+                }
+              ]
+            },
+            {
+              "id": "kr_scoring_rubric",
+              "heading": "KR Scoring Rubric",
+              "description": {
+                "th": "เกณฑ์การให้คะแนนสำหรับแต่ละ Key Result: Partial, Full, Exceed",
+                "en": "Scoring rubric per Key Result: Partial, Full, and Exceed levels"
+              },
+              "refs": [
+                "kpi_charter"
+              ],
+              "items": [
+                {
+                  "text_th": "ตาราง: KR_# | Partial (<70%) value | Full (100%) value | Exceed (>100%) value | Score formula | Unit",
+                  "text_en": "Table: KR_# | Partial (<70%) | Full (100%) | Exceed (>100%) | Score formula | Unit"
+                }
+              ]
+            },
+            {
+              "id": "kr_data_sources",
+              "heading": "KR Data Sources",
+              "description": {
+                "th": "แหล่งข้อมูลและวิธี verify ผลลัพธ์ของแต่ละ Key Result",
+                "en": "Data sources and verification method per Key Result"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "ตาราง: KR_# | Data Source | System/Tool | Data Owner (ผู้รับผิดชอบ extract) | รูปแบบข้อมูล (รายงาน/dashboard/sheet)",
+                  "text_en": "Table: KR_# | Data Source | System/Tool | Data Owner | Data Format (report/dashboard/sheet)"
+                }
+              ]
+            },
+            {
+              "id": "kr_review_schedule",
+              "heading": "Review Schedule",
+              "description": {
+                "th": "กำหนดการ review KR รายเดือนและสิ้นไตรมาส",
+                "en": "Monthly and end-of-quarter KR review schedule"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "ตาราง: Month 1 Review | Month 2 Review | Month 3 Review | Quarter-End Review — วันที่, ผู้ review, format",
+                  "text_en": "Review calendar: Month 1 | Month 2 | Month 3 | Quarter-End — date, reviewer, format"
+                },
+                {
+                  "text_th": "Escalation path: ถ้า KR tracking ติดปัญหาหรือ off-track ก่อน month-end ต้องแจ้งใคร ผ่านช่องทางใด",
+                  "text_en": "Escalation path: who to notify and via what channel if KR goes off-track before month-end"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "id": "key_activities",
+          "filename": "KEY_ACTIVITIES.md",
+          "title": "Key Activities — กิจกรรมหลักประจำไตรมาส",
+          "description": {
+            "th": "กิจกรรมหลักที่จะทำในแต่ละเดือนของไตรมาส เพื่อให้บรรลุ Key Results พร้อม milestone และ risk",
+            "en": "Core activities per month of the quarter to achieve Key Results, with milestones and risk mitigation"
+          },
+          "priority": "P0",
+          "depends_on": [
+            "key_results"
+          ],
+          "output_format": {
+            "type": "markdown",
+            "suggested_headings": [
+              "Month 1 Activities",
+              "Month 2 Activities",
+              "Month 3 Activities",
+              "Activity-KR Mapping",
+              "Dependencies & Risks"
+            ]
+          },
+          "agent_hints": {
+            "instruction": "ใช้ KEY_RESULTS.md เป็น input กำหนดกิจกรรมหลักที่ต้องทำเพื่อให้บรรลุแต่ละ KR แบ่งกิจกรรมตาม Month 1, 2, 3 ของไตรมาส แต่ละกิจกรรมต้องมี: ชื่อกิจกรรม, KR ที่ support, owner, deadline (วันเดือนปีจริง), effort estimate (Man-Days), และ dependency เพิ่ม milestone ปลายแต่ละเดือน และ top 3 risks พร้อม mitigation",
+            "input_context": "KEY_RESULTS.md (KR list, targets, deadlines, data sources); ROLE_PROFILE.md (collaboration map, constraints); CONTEXT_MAP.md (Quarter date range)",
+            "estimated_length": "700-1000 words + activity tables per month",
+            "validation": "ทุก KR ต้องมี Key Activity อย่างน้อย 1 ข้อ; ทุก Activity มี owner และ deadline; Month 1 activities เป็น foundation สำหรับ Month 2/3; Activity-KR Mapping ต้องไม่มี KR ที่ไม่มี activity support"
+          },
+          "sections": [
+            {
+              "id": "month1_activities",
+              "heading": "Month 1 Activities",
+              "description": {
+                "th": "กิจกรรมหลักของเดือนที่ 1 ในไตรมาส — ระยะ Foundation & Setup",
+                "en": "Month 1 core activities — Foundation & Setup phase"
+              },
+              "refs": [
+                "key_results"
+              ],
+              "items": [
+                {
+                  "text_th": "ตาราง Activity Month 1: Activity_# | ชื่อกิจกรรม | KR ที่ support | Owner | Deadline | Effort (MD) | Status",
+                  "text_en": "Month 1 activity table: Activity_# | Activity Name | Supporting KR | Owner | Deadline | Effort (MD) | Status"
+                },
+                {
+                  "text_th": "Month 1 Milestone: สิ่งที่ต้อง deliver และ KR ที่ควรได้ % เท่าไร ณ สิ้นเดือน 1",
+                  "text_en": "Month 1 Milestone: deliverables required and expected KR completion % by end of Month 1"
+                }
+              ]
+            },
+            {
+              "id": "month2_activities",
+              "heading": "Month 2 Activities",
+              "description": {
+                "th": "กิจกรรมหลักของเดือนที่ 2 — ระยะ Execution & Iteration",
+                "en": "Month 2 core activities — Execution & Iteration phase"
+              },
+              "refs": [
+                "key_results"
+              ],
+              "items": [
+                {
+                  "text_th": "ตาราง Activity Month 2: รูปแบบเดียวกับ Month 1",
+                  "text_en": "Month 2 activity table: same format as Month 1"
+                },
+                {
+                  "text_th": "Mid-Quarter Check: KR ที่ควรได้อย่างน้อย 50% ณ สิ้นเดือน 2 และ KR ที่เสี่ยง off-track",
+                  "text_en": "Mid-Quarter Check: KRs expected at 50%+ by end of Month 2 and at-risk KRs"
+                }
+              ]
+            },
+            {
+              "id": "month3_activities",
+              "heading": "Month 3 Activities",
+              "description": {
+                "th": "กิจกรรมหลักของเดือนที่ 3 — ระยะ Completion & Review",
+                "en": "Month 3 core activities — Completion & Review phase"
+              },
+              "refs": [
+                "key_results"
+              ],
+              "items": [
+                {
+                  "text_th": "ตาราง Activity Month 3: รูปแบบเดียวกับ Month 1",
+                  "text_en": "Month 3 activity table: same format as Month 1"
+                },
+                {
+                  "text_th": "Quarter-End Checklist: รายการสิ่งที่ต้อง complete ก่อน Q-End Presentation (data collection, report, slides)",
+                  "text_en": "Quarter-End Checklist: items to complete before Q-End Presentation (data, report, slides)"
+                }
+              ]
+            },
+            {
+              "id": "activity_kr_mapping",
+              "heading": "Activity-KR Mapping",
+              "description": {
+                "th": "ตาราง mapping แบบ many-to-many ระหว่าง Key Activities และ Key Results",
+                "en": "Many-to-many mapping matrix between Key Activities and Key Results"
+              },
+              "refs": [
+                "key_results"
+              ],
+              "items": [
+                {
+                  "text_th": "Mapping Matrix: Activity_# → KR_# (many-to-many) ตรวจสอบว่าไม่มี KR ที่ขาด activity support",
+                  "text_en": "Mapping Matrix: Activity_# → KR_# (many-to-many) verifying no KR lacks activity support"
+                }
+              ]
+            },
+            {
+              "id": "dependencies_risks",
+              "heading": "Dependencies & Risks",
+              "description": {
+                "th": "dependencies ระหว่างกิจกรรม และ risks ที่อาจกระทบความสำเร็จของ KPI",
+                "en": "Inter-activity dependencies and risks that may affect KPI achievement"
+              },
+              "refs": [
+                "role_profile"
+              ],
+              "items": [
+                {
+                  "text_th": "Dependencies Table: Activity_# | Depends On (Activity/Team/System) | Type (Internal/External) | Risk if Delayed",
+                  "text_en": "Dependencies Table: Activity_# | Depends On | Type (Internal/External) | Risk if Delayed"
+                },
+                {
+                  "text_th": "Top 3 Risks: Risk Description | Probability (H/M/L) | Impact (H/M/L) | Mitigation Plan | Owner",
+                  "text_en": "Top 3 Risks: Risk Description | Probability (H/M/L) | Impact (H/M/L) | Mitigation | Owner"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "phase_communication",
+      "order": 3,
+      "title": {
+        "th": "Phase 3 · Spec การสื่อสาร",
+        "en": "Phase 3 · Communication Spec"
+      },
+      "description": {
+        "th": "สร้าง specification สำหรับ Presentation ต้นและปลายไตรมาส",
+        "en": "Generate the spec for Q-Start/Q-End Presentations"
+      },
+      "documents": [
+        {
+          "id": "presentation_spec",
+          "filename": "PRESENTATION_SPEC.md",
+          "title": "Presentation Spec — สเปค KPI Presentation ต้นและปลายไตรมาส",
+          "description": {
+            "th": "สเปคสำหรับ 2 Presentation: Q-Start (นำเสนอแผน KPI ต้นไตรมาส) และ Q-End (นำเสนอผลลัพธ์และบทเรียนปลายไตรมาส)",
+            "en": "Spec for 2 presentations: Q-Start (KPI Planning) and Q-End (Results & Retrospective)"
+          },
+          "priority": "P1",
+          "depends_on": [
+            "key_results",
+            "key_activities"
+          ],
+          "output_format": {
+            "type": "markdown",
+            "description": "Markdown presentation specification document",
+            "suggested_headings": [
+              "Q-Start Presentation Spec",
+              "Q-End Presentation Spec",
+              "Slide Templates",
+              "Storytelling Guide"
+            ],
+            "structure": [
+              "Q-Start deck spec: slides for Strategic Alignment, KPI Overview per KPI, Quarterly Roadmap",
+              "Q-End deck spec: slides for KPI Scorecard, KPI Deep Dive per KPI, Key Learnings, Next Quarter Preview",
+              "Slide template notes: title, objective, key message, content blocks, visual guidance",
+              "Storytelling guide: opening context, KPI logic, risks, results narrative, next-quarter handoff"
+            ]
+          },
+          "agent_hints": {
+            "instruction": "สร้างไฟล์ Markdown spec สำหรับ Presentation โดยประกอบด้วย 2 ชุดในเอกสารเดียว: Q-Start deck และ Q-End deck ทุก slide ต้อง populate ด้วยข้อมูลจริงจาก KEY_RESULTS.md, KEY_ACTIVITIES.md, KPI_CHARTER.md, CONTEXT_MAP.md ห้ามเขียน placeholder — ต้องใส่ตัวเลข target, KR descriptions, activity names จริง พร้อมระบุ slide objective, key message, content blocks, visual guidance, และ speaker notes ที่จำเป็น",
+            "input_context": "KEY_RESULTS.md (KR targets, scoring rubric); KEY_ACTIVITIES.md (monthly plan, milestones); KPI_CHARTER.md (Objectives, weights, data sources); CONTEXT_MAP.md (Company Strategy, KPI Company linkage)",
+            "estimated_length": "700-1000 words + slide outlines",
+            "validation": "Q-Start ต้องมี slide สำหรับ KPI ทุกข้อ; Q-End ต้องแสดง actual vs target ทุก KR; ทั้ง 2 deck ต้อง show connection กับ Company KPI; ต้องมี storytelling arc ที่สมบูรณ์"
+          },
+          "sections": [
+            {
+              "id": "q_start_deck",
+              "heading": "Q-Start Presentation Spec",
+              "description": {
+                "th": "สเปคสำหรับ KPI Planning Presentation ต้นไตรมาส — นำเสนอว่าจะทำอะไรและอย่างไร",
+                "en": "Spec for Q-Start KPI Planning Presentation — what will be done and how"
+              },
+              "refs": [
+                "kpi_charter",
+                "key_results",
+                "key_activities",
+                "context_map"
+              ],
+              "items": [
+                {
+                  "text_th": "Audience: ผู้บังคับบัญชา, ทีม, และ stakeholders ที่เกี่ยวข้อง | Duration: 10-15 นาที + Q&A",
+                  "text_en": "Audience: direct manager, team, stakeholders | Duration: 10-15 min + Q&A"
+                },
+                {
+                  "text_th": "Slide 1 — Title Slide: ชื่อพนักงาน | ตำแหน่ง | ทีม | KPI Plan [Quarter/Year]",
+                  "text_en": "Slide 1 — Title: Employee Name | Position | Team | KPI Plan [Quarter/Year]"
+                },
+                {
+                  "text_th": "Slide 2 — Strategic Alignment: แสดง cascade จาก Company Goal → Strategic Theme → KPI Company → KPI ส่วนตัว",
+                  "text_en": "Slide 2 — Strategic Alignment: cascade from Company Goal → Strategic Theme → Company KPI → Personal KPI"
+                },
+                {
+                  "text_th": "Slides 3-N — KPI Overview (1 slide ต่อ KPI): KPI Name | Weight% | KR list + targets | Top 3 Key Activities | Timeline",
+                  "text_en": "Slides 3-N — KPI Overview (1 per KPI): KPI Name | Weight% | KRs + targets | Top 3 Activities | Timeline"
+                },
+                {
+                  "text_th": "Slide สุดท้าย — Quarterly Roadmap: Gantt-style timeline แสดง Key Activities ทั้ง 3 เดือน + milestones",
+                  "text_en": "Final Slide — Quarterly Roadmap: Gantt-style 3-month activity timeline with milestones"
+                }
+              ]
+            },
+            {
+              "id": "q_end_deck",
+              "heading": "Q-End Presentation Spec",
+              "description": {
+                "th": "สเปคสำหรับ KPI Review Presentation ปลายไตรมาส — นำเสนอผลลัพธ์จริง บทเรียน และ preview ไตรมาสถัดไป",
+                "en": "Spec for Q-End KPI Review Presentation — actual results, learnings, and next-quarter preview"
+              },
+              "refs": [
+                "key_results",
+                "kpi_charter",
+                "context_map"
+              ],
+              "items": [
+                {
+                  "text_th": "Audience: ผู้บังคับบัญชา, ทีม, HR (ถ้ามี) | Duration: 15-20 นาที + Q&A",
+                  "text_en": "Audience: direct manager, team, HR (if applicable) | Duration: 15-20 min + Q&A"
+                },
+                {
+                  "text_th": "Slide 1 — Title: ชื่อพนักงาน | ไตรมาส | KPI Results Summary",
+                  "text_en": "Slide 1 — Title: Employee Name | Quarter | KPI Results Summary"
+                },
+                {
+                  "text_th": "Slide 2 — KPI Scorecard: ตาราง KPI_# | Weight% | Target | Actual | Achievement% | Weighted Score | Overall Score",
+                  "text_en": "Slide 2 — KPI Scorecard: KPI_# | Weight% | Target | Actual | Achievement% | Weighted Score | Overall"
+                },
+                {
+                  "text_th": "Slides 3-N — KPI Deep Dive (1 slide ต่อ KPI): actual vs target per KR, variance%, root cause, evidence (screenshot/data)",
+                  "text_en": "Slides 3-N — KPI Deep Dive (1 per KPI): actual vs target per KR, variance%, root cause, evidence"
+                },
+                {
+                  "text_th": "Slide — Key Learnings: บทเรียนสำคัญ 3 ข้อ และแผนนำไปปรับปรุงในไตรมาสถัดไป",
+                  "text_en": "Slide — Key Learnings: 3 key learnings and how they will improve next quarter"
+                },
+                {
+                  "text_th": "Slide สุดท้าย — Next Quarter Preview: KPI Objectives เบื้องต้นสำหรับไตรมาสถัดไป พร้อม rationale",
+                  "text_en": "Final Slide — Next Quarter Preview: preliminary KPI Objectives for next quarter with rationale"
+                }
+              ]
+            },
+            {
+              "id": "slide_templates",
+              "heading": "Slide Templates",
+              "description": {
+                "th": "Template มาตรฐานสำหรับ slide แต่ละประเภทที่ใช้ใน Q-Start และ Q-End",
+                "en": "Standard templates for each slide type used in Q-Start and Q-End"
+              },
+              "refs": [],
+              "items": [
+                {
+                  "text_th": "KPI Overview Slide (Q-Start): [KPI Name + Weight%] | [KR List: KR description → Target → Unit] | [Key Activities Month 1/2/3] | [Company KPI Link]",
+                  "text_en": "KPI Overview Slide (Q-Start): [KPI Name + Weight%] | [KR: description → Target → Unit] | [Activities M1/2/3] | [Company KPI]"
+                },
+                {
+                  "text_th": "KPI Deep Dive Slide (Q-End): [KPI Name + Weight%] | [Actual vs Target table per KR] | [Achievement%] | [Variance & Root Cause] | [Evidence/Screenshot]",
+                  "text_en": "KPI Deep Dive (Q-End): [KPI Name + Weight%] | [Actual vs Target per KR] | [Achievement%] | [Variance + Root Cause] | [Evidence]"
+                }
+              ]
+            },
+            {
+              "id": "storytelling_guide",
+              "heading": "Storytelling Guide",
+              "description": {
+                "th": "แนวทางการเล่าเรื่อง KPI ให้ผู้บริหารเข้าใจ เห็น impact และเชื่อมกับ Company Strategy",
+                "en": "Guide for narrating KPIs to executives — clarity, impact, and Company Strategy connection"
+              },
+              "refs": [
+                "context_map"
+              ],
+              "items": [
+                {
+                  "text_th": "Q-Start Narrative Arc: Company Goal ที่เราต้องบรรลุ → KPI Company ที่ role นี้ contribute → KPI ส่วนตัวที่ออกแบบมา → แผนการทำในไตรมาสนี้",
+                  "text_en": "Q-Start Arc: Company Goal → Contributing Company KPI → Personal KPI design → Quarter execution plan"
+                },
+                {
+                  "text_th": "Q-End Narrative Arc: ทำอะไรไปบ้างในไตรมาส → ผลจริงที่ได้ vs target → impact ต่อ KPI Company → บทเรียน → ไตรมาสหน้าจะปรับอย่างไร",
+                  "text_en": "Q-End Arc: what was done → actual vs target → impact on Company KPI → learnings → next-quarter adjustments"
+                },
+                {
+                  "text_th": "Data Storytelling Rule: ทุก claim ต้องมี data evidence (ตัวเลข, chart, screenshot, report link) ห้าม narrative เดี่ยวโดยไม่มีหลักฐาน",
+                  "text_en": "Data Storytelling Rule: every claim must have data evidence (numbers, chart, screenshot, report link) — no unsupported narrative"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "deliverables": {
+    "title": {
+      "th": "ผลลัพธ์ครบชุดของ DDD-KPI",
+      "en": "Complete DDD-KPI Deliverables"
+    },
+    "description": {
+      "th": "เอกสาร KPI ชุดครบ 6 ฉบับ: Context (2) + KPI Design (3) + Communication Spec (1) — พร้อมใช้งานสำหรับพนักงานทุกระดับใน Ragnar",
+      "en": "6-document KPI package: Context (2) + KPI Design (3) + Communication Spec (1) — ready for all Ragnar employee levels"
+    },
+    "artifacts": [
+      {
+        "id": "context_artifacts",
+        "title": {
+          "th": "เอกสาร Context & Alignment (Phase 1)",
+          "en": "Context & Alignment Documents (Phase 1)"
+        },
+        "items": [
+          {
+            "text_th": "CONTEXT_MAP.md — แผนที่บริบท: Company Strategy → KPI Company → Role alignment",
+            "text_en": "CONTEXT_MAP.md — Context map: Company Strategy → Company KPI → Role alignment"
+          },
+          {
+            "text_th": "ROLE_PROFILE.md — สรุปบทบาท ความรับผิดชอบ collaboration และ KPI constraints จาก JD + Job Landscape",
+            "text_en": "ROLE_PROFILE.md — Role summary, responsibilities, collaboration map, KPI constraints from JD + Landscape"
+          }
+        ]
+      },
+      {
+        "id": "kpi_artifacts",
+        "title": {
+          "th": "เอกสาร KPI Design — ผลลัพธ์หลัก (Phase 2)",
+          "en": "KPI Design Documents — Core Output (Phase 2)"
+        },
+        "items": [
+          {
+            "text_th": "KPI_CHARTER.md — KPI Objectives พร้อม weight, targets (3 ระดับ), measurement method, และ policy compliance",
+            "text_en": "KPI_CHARTER.md — KPI Objectives with weight, 3-level targets, measurement method, policy compliance"
+          },
+          {
+            "text_th": "KEY_RESULTS.md — Key Results ที่เป็น SMART ต่อทุก KPI Objective พร้อม scoring rubric และ data sources",
+            "text_en": "KEY_RESULTS.md — SMART Key Results per KPI Objective with scoring rubric and data sources"
+          },
+          {
+            "text_th": "KEY_ACTIVITIES.md — Key Activities แบ่งตาม Month 1/2/3 พร้อม owner, deadline, effort และ risk mitigation",
+            "text_en": "KEY_ACTIVITIES.md — Key Activities by Month 1/2/3 with owner, deadline, effort, risk mitigation"
+          }
+        ]
+      },
+      {
+        "id": "communication_artifacts",
+        "title": {
+          "th": "เอกสาร Communication Spec (Phase 3)",
+          "en": "Communication Spec Document (Phase 3)"
+        },
+        "items": [
+          {
+            "text_th": "PRESENTATION_SPEC.md — Slide spec สำหรับ Q-Start KPI Planning และ Q-End KPI Review presentation",
+            "text_en": "PRESENTATION_SPEC.md — Slide spec for Q-Start KPI Planning and Q-End KPI Review presentations"
+          }
+        ]
+      }
+    ],
+    "readiness_gates": [
+      {
+        "id": "context_readiness",
+        "title": {
+          "th": "Context Readiness — Phase 1 ผ่านแล้ว",
+          "en": "Context Readiness — Phase 1 Complete"
+        },
+        "checklist": [
+          {
+            "text_th": "CONTEXT_MAP.md ระบุ quarter, ปี, ชื่อพนักงาน, ตำแหน่ง และทีมอย่างชัดเจน",
+            "text_en": "CONTEXT_MAP.md specifies quarter, year, employee name, position, and team"
+          },
+          {
+            "text_th": "ทุก KPI Company ถูก map กับ Strategic Theme อย่างน้อย 1 ข้อ",
+            "text_en": "All Company KPIs are mapped to at least 1 Strategic Theme"
+          },
+          {
+            "text_th": "Role-KPI Alignment Matrix ระบุว่า role นี้ primary/secondary/none ต่อ KPI Company แต่ละข้อ",
+            "text_en": "Role-KPI Alignment Matrix identifies primary/secondary/none contribution per Company KPI"
+          },
+          {
+            "text_th": "ROLE_PROFILE.md Core Responsibilities สอดคล้องกับ JD จริง ไม่มีหน้าที่ที่ไม่ได้มาจาก JD",
+            "text_en": "ROLE_PROFILE.md Core Responsibilities match actual JD with no fabricated duties"
+          },
+          {
+            "text_th": "KPI Constraints ใน ROLE_PROFILE.md อ้างอิง KPI Policy โดยระบุ section ที่เกี่ยวข้อง",
+            "text_en": "KPI Constraints in ROLE_PROFILE.md cite KPI Policy with relevant section references"
+          }
+        ]
+      },
+      {
+        "id": "kpi_design_readiness",
+        "title": {
+          "th": "KPI Design Readiness — Phase 2 ผ่านแล้ว",
+          "en": "KPI Design Readiness — Phase 2 Complete"
+        },
+        "checklist": [
+          {
+            "text_th": "KPI_CHARTER.md: Total weight ของ KPI ทั้งหมด = 100% เท่านั้น",
+            "text_en": "KPI_CHARTER.md: Total KPI weight = 100% exactly"
+          },
+          {
+            "text_th": "ทุก KPI ส่วนตัว link ไปยัง KPI Company อย่างน้อย 1 ข้อ",
+            "text_en": "Every personal KPI links to at least 1 Company KPI"
+          },
+          {
+            "text_th": "ทุก KPI มี data source ที่ verify ได้ระบุใน KPI_CHARTER.md",
+            "text_en": "Every KPI has an identifiable, verifiable data source in KPI_CHARTER.md"
+          },
+          {
+            "text_th": "จำนวน KPI อยู่ใน range ที่ KPI Policy กำหนดสำหรับ role ระดับนี้",
+            "text_en": "KPI count is within the range mandated by KPI Policy for this role level"
+          },
+          {
+            "text_th": "KEY_RESULTS.md: ทุก KR มีตัวเลข target, unit, และ deadline ที่ชัดเจน",
+            "text_en": "KEY_RESULTS.md: every KR has a numeric target, unit, and clear deadline"
+          },
+          {
+            "text_th": "ทุก KPI Objective มี KR อย่างน้อย 2 ข้อ",
+            "text_en": "Every KPI Objective has at least 2 Key Results"
+          },
+          {
+            "text_th": "KEY_ACTIVITIES.md ครอบคลุมทั้ง Month 1, 2, และ 3 พร้อม milestone ปลายแต่ละเดือน",
+            "text_en": "KEY_ACTIVITIES.md covers all of Month 1, 2, and 3 with end-of-month milestones"
+          },
+          {
+            "text_th": "Activity-KR Mapping ไม่มี KR ที่ขาด Key Activity support",
+            "text_en": "Activity-KR Mapping shows no KR without supporting Key Activity"
+          }
+        ]
+      },
+      {
+        "id": "communication_readiness",
+        "title": {
+          "th": "Communication Readiness — Phase 3 ผ่านแล้ว",
+          "en": "Communication Readiness — Phase 3 Complete"
+        },
+        "checklist": [
+          {
+            "text_th": "PRESENTATION_SPEC.md มีทั้ง Q-Start deck spec และ Q-End deck spec ครบถ้วน",
+            "text_en": "PRESENTATION_SPEC.md includes both complete Q-Start and Q-End deck specs"
+          },
+          {
+            "text_th": "Q-Start deck แสดง connection จาก Company Strategy ถึง KPI ส่วนตัวในทุก KPI slide",
+            "text_en": "Q-Start deck shows Company Strategy connection in every KPI slide"
+          },
+          {
+            "text_th": "Q-End deck มี slide แสดง actual vs target per KR สำหรับทุก KPI",
+            "text_en": "Q-End deck has actual vs target per KR slides for every KPI"
+          }
+        ]
+      }
+    ]
+  }
+}
