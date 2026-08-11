@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KPI Presentation — กมลชนก รุ่งโรจน์กิจไพศาล — Q3/2026</title>
+<style>
+  :root {
+    --surface-1: #fcfcfb;
+    --page-plane: #f9f9f7;
+    --text-primary: #0b0b0b;
+    --text-secondary: #52514e;
+    --text-muted: #898781;
+    --gridline: #e1e0d9;
+    --baseline: #c3c2b7;
+    --border: rgba(11,11,11,0.10);
+    --success-text: #006300;
+
+    --series-1: #2a78d6; /* blue   - KPI_1 Cash Flow */
+    --series-2: #eb6834; /* orange - KPI_2 Budget Variance */
+    --series-3: #1baf7a; /* aqua   - KPI_3 Reporting */
+    --series-4: #eda100; /* yellow - KPI_4 Team Leadership */
+    --series-5: #e87ba4; /* magenta - iKPI_5 Automation */
+
+    --status-good: #0ca30c;
+    --status-warning: #fab219;
+    --status-serious: #ec835a;
+    --status-critical: #d03b3b;
+  }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0; height: 100%;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    background: var(--page-plane);
+    color: var(--text-primary);
+  }
+  .deck {
+    position: relative;
+    width: 100vw; height: 100vh;
+    overflow: hidden;
+  }
+  .slide {
+    position: absolute; inset: 0;
+    display: none;
+    flex-direction: column;
+    padding: 56px 72px;
+    background: var(--surface-1);
+  }
+  .slide.active { display: flex; }
+  .eyebrow {
+    font-size: 13px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--text-muted); font-weight: 600; margin-bottom: 6px;
+  }
+  h1 { font-size: 34px; margin: 0 0 4px 0; font-weight: 700; }
+  h2 { font-size: 26px; margin: 0 0 18px 0; font-weight: 700; }
+  .key-message {
+    font-size: 17px; color: var(--text-secondary); margin-bottom: 22px;
+    padding: 12px 16px; background: var(--page-plane); border-left: 4px solid var(--series-1);
+    border-radius: 4px;
+  }
+  .content { flex: 1; overflow-y: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; margin-bottom: 18px; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--gridline); }
+  th { color: var(--text-muted); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.03em; }
+  td { color: var(--text-primary); }
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 999px;
+    font-size: 12px; font-weight: 700; color: #fff;
+  }
+  .grid-5 { display: grid; grid-template-columns: repeat(5, 1fr); gap: 14px; margin-bottom: 18px; }
+  .card {
+    border: 1px solid var(--border); border-radius: 10px; padding: 14px;
+    background: var(--surface-1);
+  }
+  .card .card-title { font-weight: 700; font-size: 13px; margin-bottom: 8px; }
+  .card ul { margin: 0; padding-left: 18px; font-size: 12.5px; color: var(--text-secondary); }
+  .card ul li { margin-bottom: 4px; }
+  .footer-nav {
+    position: absolute; bottom: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 14px 32px; background: var(--surface-1); border-top: 1px solid var(--gridline);
+    font-size: 13px; color: var(--text-muted);
+  }
+  .nav-btns button {
+    border: 1px solid var(--border); background: var(--page-plane); color: var(--text-primary);
+    padding: 7px 16px; border-radius: 6px; cursor: pointer; font-size: 13px; margin-left: 8px;
+  }
+  .nav-btns button:hover { background: var(--gridline); }
+  .nav-btns button:disabled { opacity: 0.35; cursor: default; }
+  .divider {
+    align-items: center; justify-content: center; text-align: center;
+  }
+  .divider h1 { font-size: 48px; }
+  .divider p { font-size: 16px; color: var(--text-secondary); }
+  .placeholder { color: var(--text-muted); font-style: italic; }
+  .gantt-row { display: flex; align-items: center; margin-bottom: 8px; font-size: 12.5px; }
+  .gantt-label { width: 170px; flex-shrink: 0; color: var(--text-secondary); }
+  .gantt-track { flex: 1; display: flex; height: 22px; background: var(--page-plane); border-radius: 4px; overflow: hidden; }
+  .gantt-seg { height: 100%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 10.5px; font-weight: 600; }
+  .gantt-month-header { display: flex; margin-bottom: 6px; margin-left: 170px; font-size: 11px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.04em; }
+  .gantt-month-header div { flex: 1; text-align: center; }
+  .legend { display: flex; gap: 16px; margin-top: 10px; flex-wrap: wrap; font-size: 12px; color: var(--text-secondary); }
+  .legend span.dot { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: middle; }
+  .two-col { display: grid; grid-template-columns: 1.1fr 1fr; gap: 24px; }
+  .note-box {
+    background: #fff8ea; border: 1px solid #f0d896; border-radius: 8px;
+    padding: 10px 14px; font-size: 13px; color: #6b5410; margin-bottom: 14px;
+  }
+  .subtle-list { font-size: 14px; color: var(--text-secondary); line-height: 1.7; }
+</style>
+</head>
+<body>
+
+<div class="deck" id="deck">
+
+  <!-- SLIDE 1: Q-Start Title -->
+  <div class="slide active divider" style="justify-content:center; align-items:center;">
+    <div class="eyebrow">Q-Start Presentation · KPI Planning</div>
+    <h1>กมลชนก รุ่งโรจน์กิจไพศาล</h1>
+    <p style="font-size:20px; margin:4px 0;">Assistant Finance Manager · BOS (Finance Team)</p>
+    <p style="font-size:22px; font-weight:700; margin-top:18px;">KPI Plan — Q3/2026</p>
+    <p style="color:var(--text-muted); font-size:14px;">1 กรกฎาคม – 30 กันยายน 2569</p>
+  </div>
+
+  <!-- SLIDE 2: Strategic Alignment -->
+  <div class="slide">
+    <div class="eyebrow">Q-Start · Slide 2</div>
+    <h2>Strategic Alignment</h2>
+    <div class="key-message">ทุก KPI ของฉันเชื่อมตรงกับ Financial Management และ Team Leadership ที่ Oak เป็นเจ้าของในระดับองค์กร</div>
+    <div class="content">
+      <div class="two-col">
+        <div>
+          <table>
+            <tr><th>ระดับ</th><th>เนื้อหา</th></tr>
+            <tr><td>Company Goal</td><td>สร้างระบบนิเวศ B2B ที่ขับเคลื่อนด้วย AI ชั้นนำของไทย</td></tr>
+            <tr><td>Strategic Theme</td><td>Monetization · Agility · Scaling · Standard</td></tr>
+            <tr><td>Company KPI (Oak)</td><td><b>Primary:</b> KPI3 Financial Management, KPI5 Team Leadership &amp; Development<br><b>Secondary:</b> KPI1, KPI2, KPI4, KPI6, KPI7</td></tr>
+            <tr><td>Personal KPI (5 ข้อ)</td><td>Cash Flow Forecast Accuracy · Budget Variance Control · Financial Reporting Timeliness &amp; Accuracy · Finance Team Leadership &amp; Development · Finance Alert &amp; Automation System (iKPI)</td></tr>
+          </table>
+        </div>
+        <div class="card" style="display:flex; flex-direction:column; justify-content:center; gap:10px;">
+          <div style="text-align:center; padding:8px; border-radius:6px; background:var(--page-plane); font-weight:700;">Company Goal</div>
+          <div style="text-align:center; color:var(--text-muted);">↓</div>
+          <div style="text-align:center; padding:8px; border-radius:6px; background:var(--page-plane); font-weight:700;">Strategic Theme</div>
+          <div style="text-align:center; color:var(--text-muted);">↓</div>
+          <div style="text-align:center; padding:8px; border-radius:6px; background:var(--series-1); color:#fff; font-weight:700;">Company KPI (Oak) — KPI3, KPI5</div>
+          <div style="text-align:center; color:var(--text-muted);">↓</div>
+          <div style="text-align:center; padding:8px; border-radius:6px; background:var(--series-3); color:#fff; font-weight:700;">Personal KPI × 5</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 3-7: KPI Overview -->
+  <div class="slide">
+    <div class="eyebrow">Q-Start · Slide 3</div>
+    <h2><span class="badge" style="background:var(--series-1);">Weight 20%</span> &nbsp;KPI_1 — Cash Flow Forecast Accuracy</h2>
+    <div class="content two-col">
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Key Results</div>
+        <table>
+          <tr><th>KR</th><th>เป้าหมาย</th><th>Deadline</th></tr>
+          <tr><td>KR_1.1 Accuracy ก.ค.</td><td>100% (0% variance)</td><td>31 ก.ค. 2569</td></tr>
+          <tr><td>KR_1.2 Accuracy ส.ค.</td><td>100% (0% variance)</td><td>31 ส.ค. 2569</td></tr>
+          <tr><td>KR_1.3 Accuracy ก.ย.</td><td>100% (0% variance)</td><td>30 ก.ย. 2569</td></tr>
+          <tr><td>KR_1.4 Proactive risk flag</td><td>≥1 ครั้ง</td><td>30 ก.ย. 2569</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Top Activities &amp; Link</div>
+        <ul class="subtle-list">
+          <li>A1.1 จัดทำ Cash Flow Forecast Model</li>
+          <li>A1.2 Monitor cash in/out ตลอดเดือน</li>
+          <li>A3.2 Forecast เดือน ก.ย.</li>
+        </ul>
+        <p style="margin-top:14px;"><b>Company KPI Link:</b> KPI3 — Financial Management</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="eyebrow">Q-Start · Slide 4</div>
+    <h2><span class="badge" style="background:var(--series-2);">Weight 20%</span> &nbsp;KPI_2 — Budget Variance Control</h2>
+    <div class="content two-col">
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Key Results</div>
+        <table>
+          <tr><th>KR</th><th>เป้าหมาย</th><th>Deadline</th></tr>
+          <tr><td>KR_2.1 Variance ก.ค.</td><td>≤5%</td><td>31 ก.ค. 2569</td></tr>
+          <tr><td>KR_2.2 Variance ส.ค.</td><td>≤5%</td><td>31 ส.ค. 2569</td></tr>
+          <tr><td>KR_2.3 Variance ก.ย.</td><td>≤5%</td><td>30 ก.ย. 2569</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Top Activities &amp; Link</div>
+        <ul class="subtle-list">
+          <li>A1.3 / A2.3 / A3.3 Budget Tracking &amp; Variance รายเดือน</li>
+        </ul>
+        <p style="margin-top:14px;"><b>Company KPI Link:</b> KPI3 Financial Management, KPI4 Operational Excellence</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="eyebrow">Q-Start · Slide 5</div>
+    <h2><span class="badge" style="background:var(--series-3);">Weight 20%</span> &nbsp;KPI_3 — Financial Reporting Timeliness &amp; Accuracy</h2>
+    <div class="content two-col">
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Key Results</div>
+        <table>
+          <tr><th>KR</th><th>เป้าหมาย</th><th>Deadline</th></tr>
+          <tr><td>KR_3.1 รายงาน ก.ค.</td><td>100% on-time</td><td>5 ส.ค. 2569</td></tr>
+          <tr><td>KR_3.2 รายงาน ส.ค.</td><td>100% on-time</td><td>5 ก.ย. 2569</td></tr>
+          <tr><td>KR_3.3 รายงาน ก.ย. (Q-End)</td><td>100% on-time</td><td>5 ต.ค. 2569</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Top Activities &amp; Link</div>
+        <ul class="subtle-list">
+          <li>A2.1 / A3.1 / A3.6 จัดทำและส่งรายงานรายเดือน</li>
+        </ul>
+        <p style="margin-top:14px;"><b>Company KPI Link:</b> KPI3 Financial Management, KPI6 Standard &amp; Sustainability</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="eyebrow">Q-Start · Slide 6</div>
+    <h2><span class="badge" style="background:var(--series-4); color:#4a3400;">Weight 20%</span> &nbsp;KPI_4 — Finance Team Leadership &amp; Development</h2>
+    <div class="content two-col">
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Key Results</div>
+        <table>
+          <tr><th>KR</th><th>เป้าหมาย</th><th>Deadline</th></tr>
+          <tr><td>KR_4.1 On-time ก.ค.</td><td>100%</td><td>31 ก.ค. 2569</td></tr>
+          <tr><td>KR_4.2 On-time ส.ค.</td><td>100%</td><td>31 ส.ค. 2569</td></tr>
+          <tr><td>KR_4.3 On-time ก.ย.</td><td>100%</td><td>30 ก.ย. 2569</td></tr>
+        </table>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Top Activities &amp; Link</div>
+        <ul class="subtle-list">
+          <li>A1.4 / A2.4 / A3.4 ติดตามงานลูกทีม + coaching (weekly check-in)</li>
+        </ul>
+        <p style="margin-top:14px;"><b>Company KPI Link:</b> KPI5 — Team Leadership &amp; Development</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="eyebrow">Q-Start · Slide 7</div>
+    <h2><span class="badge" style="background:var(--series-5);">Weight 20%</span> &nbsp;iKPI_5 — Finance Alert &amp; Automation System</h2>
+    <div class="content two-col">
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Key Results (Milestone-based)</div>
+        <table>
+          <tr><th>KR</th><th>เป้าหมาย</th><th>Deadline</th></tr>
+          <tr><td>KR_5.1 Requirement &amp; Design</td><td>100%</td><td>31 ก.ค. 2569</td></tr>
+          <tr><td>KR_5.2 Build</td><td>100%</td><td>31 ส.ค. 2569</td></tr>
+          <tr><td>KR_5.3 Deploy &amp; Validate</td><td>100%</td><td>5 ต.ค. 2569*</td></tr>
+        </table>
+        <p style="font-size:11.5px; color:var(--text-muted);">*Assumption: ตีความจากคำตอบ "ภายในวันที่ 5 ของเดือน" — ควร confirm ก่อนใช้จริง</p>
+      </div>
+      <div>
+        <div class="card-title" style="margin-bottom:6px;">Top Activities &amp; Link</div>
+        <ul class="subtle-list">
+          <li>A1.5 Requirement/Design → A2.5 Build → A3.5 Deploy &amp; Validate</li>
+        </ul>
+        <p style="margin-top:14px;"><b>Company KPI Link:</b> KPI7 Innovation &amp; Productization, KPI4 Operational Excellence</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- SLIDE 8: Quarterly Roadmap -->
+  <div class="slide">
+    <div class="eyebrow">Q-Start · Final Slide</div>
+    <h2>Quarterly Roadmap — Q3/2026</h2>
+    <div class="content">
+      <div class="gantt-month-header"><div>กรกฎาคม</div><div>สิงหาคม</div><div>กันยายน</div></div>
+
+      <div class="gantt-row"><div class="gantt-label">KPI_1 Cash Flow</div>
+        <div class="gantt-track">
+          <div class="gantt-seg" style="width:33.3%; background:var(--series-1);">Forecast+Monitor</div>
+          <div class="gantt-seg" style="width:33.3%; background:var(--series-1); opacity:.75;">Forecast+Monitor</div>
+          <div class="gantt-seg" style="width:33.4%; background:var(--series-1); opacity:.55;">Forecast+Monitor</div>
+        </div>
+      </div>
+      <div class="gantt-row"><div class="gantt-label">KPI_2 Budget Variance</div>
+        <div class="gantt-track">
+          <div class="gantt-seg" style="width:33.3%; background:var(--series-2);">Tracking</div>
+          <div class="gantt-seg" style="width:33.3%; background:var(--series-2); opacity:.75;">Tracking</div>
+          <div class="gantt-seg" style="width:33.4%; background:var(--series-2); opacity:.55;">Tracking</div>
+        </div>
+      </div>
+      <div class="gantt-row"><div class="gantt-label">KPI_3 Reporting</div>
+        <div class="gantt-track">
+          <div class="gantt-seg" style="width:5%; background:var(--gridline);"></div>
+          <div class="gantt-seg" style="width:5%; background:var(--series-3);">5 ส.ค.</div>
+          <div class="gantt-seg" style="width:28.3%; background:var(--gridline);"></div>
+          <div class="gantt-seg" style="width:5%; background:var(--series-3); opacity:.8;">5 ก.ย.</div>
+          <div class="gantt-seg" style="width:28.4%; background:var(--gridline);"></div>
+          <div class="gantt-seg" style="width:5%; background:var(--series-3); opacity:.6;">5 ต.ค.</div>
+          <div class="gantt-seg" style="width:23.3%; background:var(--gridline);"></div>
+        </div>
+      </div>
+      <div class="gantt-row"><div class="gantt-label">KPI_4 Team Leadership</div>
+        <div class="gantt-track">
+          <div class="gantt-seg" style="width:33.3%; background:var(--series-4); color:#4a3400;">Coaching</div>
+          <div class="gantt-seg" style="width:33.3%; background:var(--series-4); opacity:.75; color:#4a3400;">Coaching</div>
+          <div class="gantt-seg" style="width:33.4%; background:var(--series-4); opacity:.55; color:#4a3400;">Coaching</div>
+        </div>
+      </div>
+      <div class="gantt-row"><div class="gantt-label">iKPI_5 Automation</div>
+        <div class="gantt-track">
+          <div class="gantt-seg" style="width:33.3%; background:var(--series-5);">Design</div>
+          <div class="gantt-seg" style="width:33.3%; background:var(--series-5); opacity:.75;">Build</div>
+          <div class="gantt-seg" style="width:33.4%; background:var(--series-5); opacity:.55;">Deploy</div>
+        </div>
+      </div>
+
+      <div class="legend">
+        <span><span class="dot" style="background:var(--series-1);"></span>KPI_1 Cash Flow</span>
+        <span><span class="dot" style="background:var(--series-2);"></span>KPI_2 Budget</span>
+        <span><span class="dot" style="background:var(--series-3);"></span>KPI_3 Reporting</span>
+        <span><span class="dot" style="background:var(--series-4);"></span>KPI_4 Team Leadership</span>
+        <span><span class="dot" style="background:var(--series-5);"></span>iKPI_5 Automation</span>
+      </div>
+
+      <p style="margin-top:18px; font-size:13px; color:var(--text-secondary);"><b>Milestones:</b> สิ้น ก.ค. — Setup เสร็จ (Forecast/Budget process, Design ระบบ Automation) · สิ้น ส.ค. — Mid-quarter check, Build เสร็จ · สิ้น ก.ย./5 ต.ค. — Deploy สำเร็จ, รายงานครบ, เตรียม Q-End</p>
+    </div>
+  </div>
+
+  <!-- DIVIDER -->
+  <div class="slide divider" style="justify-content:center; align-items:center;">
+    <div class="eyebrow">Section</div>
+    <h1>Q-End Presentation</h1>
+    <p>KPI Review &amp; Retrospective — Q3/2026</p>
+  </div>
+
+  <!-- Q-End Slide 1: Title -->
+  <div class="slide divider" style="justify-content:center; align-items:center;">
+    <div class="eyebrow">Q-End Presentation · KPI Results</div>
+    <h1>กมลชนก รุ่งโรจน์กิจไพศาล</h1>
+    <p style="font-size:20px;">Q3/2026 — KPI Results Summary</p>
+  </div>
+
+  <!-- Q-End Slide 2: Scorecard -->
+  <div class="slide">
+    <div class="eyebrow">Q-End · Slide 2</div>
+    <h2>KPI Scorecard</h2>
+    <div class="note-box">เอกสารนี้เป็น spec ที่จัดทำก่อนเริ่มไตรมาส — คอลัมน์ Actual/Achievement% ยังไม่มีข้อมูลจริงเพราะไตรมาสยังไม่จบ ต้องกรอกจากข้อมูลจริงใน KEY_RESULTS.md Data Source ตอนสิ้น Q3/2026</div>
+    <div class="content">
+      <table>
+        <tr><th>KPI</th><th>Weight</th><th>Target</th><th>Actual</th><th>Achievement%</th><th>Weighted Score</th></tr>
+        <tr><td>KPI_1 Cash Flow Forecast Accuracy</td><td>20%</td><td>100% Accuracy</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td><td class="placeholder">—</td></tr>
+        <tr><td>KPI_2 Budget Variance Control</td><td>20%</td><td>≤5% Variance</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td><td class="placeholder">—</td></tr>
+        <tr><td>KPI_3 Financial Reporting Timeliness</td><td>20%</td><td>100% On-time</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td><td class="placeholder">—</td></tr>
+        <tr><td>KPI_4 Finance Team Leadership</td><td>20%</td><td>100% On-time</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td><td class="placeholder">—</td></tr>
+        <tr><td>iKPI_5 Finance Alert &amp; Automation</td><td>20%</td><td>100% Deploy</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td><td class="placeholder"><b>Overall: —</b></td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- Q-End Deep Dive slides 3-7 -->
+  <div class="slide">
+    <div class="eyebrow">Q-End · Slide 3 — Deep Dive</div>
+    <h2><span class="badge" style="background:var(--series-1);">Weight 20%</span> &nbsp;KPI_1 — Cash Flow Forecast Accuracy</h2>
+    <div class="content">
+      <table>
+        <tr><th>KR</th><th>Target</th><th>Actual</th><th>Variance%</th></tr>
+        <tr><td>KR_1.1 (ก.ค.)</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_1.2 (ส.ค.)</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_1.3 (ก.ย.)</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_1.4 Proactive risk flag</td><td>≥1 ครั้ง</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+      </table>
+      <p><b>Root Cause (ถ้าไม่ถึงเป้า):</b> <span class="placeholder">กรอกเมื่อสิ้นไตรมาส</span> &nbsp; | &nbsp; <b>Evidence:</b> <span class="placeholder">Cash Flow Dashboard / Bank Statement</span></p>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="eyebrow">Q-End · Slide 4 — Deep Dive</div>
+    <h2><span class="badge" style="background:var(--series-2);">Weight 20%</span> &nbsp;KPI_2 — Budget Variance Control</h2>
+    <div class="content">
+      <table>
+        <tr><th>KR</th><th>Target</th><th>Actual</th><th>Variance%</th></tr>
+        <tr><td>KR_2.1 (ก.ค.)</td><td>≤5%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_2.2 (ส.ค.)</td><td>≤5%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_2.3 (ก.ย.)</td><td>≤5%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+      </table>
+      <p><b>Root Cause (ถ้าไม่ถึงเป้า):</b> <span class="placeholder">กรอกเมื่อสิ้นไตรมาส</span> &nbsp; | &nbsp; <b>Evidence:</b> <span class="placeholder">Budget vs Actual Report</span></p>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="eyebrow">Q-End · Slide 5 — Deep Dive</div>
+    <h2><span class="badge" style="background:var(--series-3);">Weight 20%</span> &nbsp;KPI_3 — Financial Reporting Timeliness &amp; Accuracy</h2>
+    <div class="content">
+      <table>
+        <tr><th>KR</th><th>Target</th><th>Actual</th><th>Variance%</th></tr>
+        <tr><td>KR_3.1 (ก.ค. report)</td><td>100% on-time</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_3.2 (ส.ค. report)</td><td>100% on-time</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_3.3 (ก.ย. / Q-End report)</td><td>100% on-time</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+      </table>
+      <p><b>Root Cause (ถ้าไม่ถึงเป้า):</b> <span class="placeholder">กรอกเมื่อสิ้นไตรมาส</span> &nbsp; | &nbsp; <b>Evidence:</b> <span class="placeholder">Report Overview Dashboard / submission log</span></p>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="eyebrow">Q-End · Slide 6 — Deep Dive</div>
+    <h2><span class="badge" style="background:var(--series-4); color:#4a3400;">Weight 20%</span> &nbsp;KPI_4 — Finance Team Leadership &amp; Development</h2>
+    <div class="content">
+      <table>
+        <tr><th>KR</th><th>Target</th><th>Actual</th><th>Variance%</th></tr>
+        <tr><td>KR_4.1 (ก.ค.)</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_4.2 (ส.ค.)</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_4.3 (ก.ย.)</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+      </table>
+      <p><b>Root Cause (ถ้าไม่ถึงเป้า):</b> <span class="placeholder">กรอกเมื่อสิ้นไตรมาส</span> &nbsp; | &nbsp; <b>Evidence:</b> <span class="placeholder">Task tracker / 1:1 log</span></p>
+    </div>
+  </div>
+
+  <div class="slide">
+    <div class="eyebrow">Q-End · Slide 7 — Deep Dive</div>
+    <h2><span class="badge" style="background:var(--series-5);">Weight 20%</span> &nbsp;iKPI_5 — Finance Alert &amp; Automation System</h2>
+    <div class="content">
+      <table>
+        <tr><th>KR</th><th>Target</th><th>Actual</th><th>Variance%</th></tr>
+        <tr><td>KR_5.1 Requirement &amp; Design</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_5.2 Build</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+        <tr><td>KR_5.3 Deploy &amp; Validate</td><td>100%</td><td class="placeholder">กรอกเมื่อสิ้นไตรมาส</td><td class="placeholder">—</td></tr>
+      </table>
+      <p><b>Root Cause (ถ้าไม่ถึงเป้า):</b> <span class="placeholder">กรอกเมื่อสิ้นไตรมาส</span> &nbsp; | &nbsp; <b>Evidence:</b> <span class="placeholder">Project completion checklist / deployment log</span></p>
+    </div>
+  </div>
+
+  <!-- Q-End Key Learnings -->
+  <div class="slide">
+    <div class="eyebrow">Q-End · Key Learnings</div>
+    <h2>Key Learnings</h2>
+    <div class="content">
+      <ol class="subtle-list">
+        <li class="placeholder">กรอกเมื่อสิ้นไตรมาส — บทเรียนที่ 1</li>
+        <li class="placeholder">กรอกเมื่อสิ้นไตรมาส — บทเรียนที่ 2</li>
+        <li class="placeholder">กรอกเมื่อสิ้นไตรมาส — บทเรียนที่ 3</li>
+      </ol>
+      <p style="font-size:13px; color:var(--text-secondary); margin-top:14px;"><b>แนะนำให้ครอบคลุมอย่างน้อย 1 ข้อจาก Risk ที่ระบุใน KEY_ACTIVITIES.md:</b> target ที่ตั้งไว้ 100% ไม่มี margin ผิดพลาด, dependency กับทีมอื่น (Account/Purchase/Admin), dependency กับ IT/AI-Automation resource</p>
+    </div>
+  </div>
+
+  <!-- Q-End Next Quarter Preview -->
+  <div class="slide">
+    <div class="eyebrow">Q-End · Final Slide</div>
+    <h2>Next Quarter Preview — Q4/2026</h2>
+    <div class="content">
+      <p class="placeholder">กรอกเมื่อสิ้นไตรมาส — เสนอ KPI เบื้องต้นสำหรับ Q4/2026 พร้อม rationale</p>
+      <div class="note-box" style="margin-top:14px;">แนวทาง: พิจารณาจาก KPI ที่ยังไม่บรรลุใน Q3 ให้สานต่อ และต่อยอด iKPI_5 (Finance Alert &amp; Automation System) เป็น KPI ถาวรหากใช้งานได้ผลจริง ตาม PC-MR-02 ข้อ 4.5.6 (iKPI ที่เสถียรแล้วให้เปลี่ยนเป็น KPI ไตรมาสถัดไป)</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="footer-nav">
+  <div id="slide-counter">1 / 18</div>
+  <div style="color:var(--text-muted);">KPI Presentation Q3/2026 — กมลชนก รุ่งโรจน์กิจไพศาล (Assistant Finance Manager)</div>
+  <div class="nav-btns">
+    <button id="prevBtn" onclick="go(-1)">← ก่อนหน้า</button>
+    <button id="nextBtn" onclick="go(1)">ถัดไป →</button>
+  </div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  let idx = 0;
+  function render() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === idx));
+    document.getElementById('slide-counter').textContent = (idx+1) + ' / ' + slides.length;
+    document.getElementById('prevBtn').disabled = idx === 0;
+    document.getElementById('nextBtn').disabled = idx === slides.length - 1;
+  }
+  function go(delta) {
+    idx = Math.min(Math.max(idx + delta, 0), slides.length - 1);
+    render();
+  }
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown') go(1);
+    if (e.key === 'ArrowLeft' || e.key === 'PageUp') go(-1);
+  });
+  render();
+</script>
+
+</body>
+</html>
